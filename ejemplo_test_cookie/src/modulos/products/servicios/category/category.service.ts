@@ -49,7 +49,7 @@ export class CategoryService {
 
                 let save = this.repository.create({
                     name: dto.name,
-                    slug: slugify(dto.name)
+                    slug: slugify(dto.name, { lower: true, strict: true })
                 });
 
                 await this.repository.save(save);
@@ -86,7 +86,7 @@ export class CategoryService {
 
             await this.repository.update(id, {
                 name: dto.name,
-                slug: slugify(dto.name)
+                slug: slugify(dto.name, { lower: true, strict: true })
             });
 
         return { "state": "ok", "message": `${process.env.MESSAGE_CUSTOM_SUCCESS_UPDATE}` }

@@ -5,9 +5,22 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { DisableOptionsInterceptor } from './security/disable-options/disable-options.interceptor';
 import { SetSecurityHeadersInterceptor } from './security/set-security-headers/set-security-headers.interceptor';
 import { HttpExceptionFilter } from './filters/HttpExceptionFilter.filter';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const environment = process.env.ENVIRONMENT ?? 'local';
+  //swagger
+
+  const config = new DocumentBuilder()
+  .setTitle('API Documentación')
+  .setDescription('API creada de ejemplo')
+  .setVersion('1.0.0')
+  .addTag("Category")
+  .addTag("Health")
+  .build();
+  let document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('documentacion', app, document);
+  //CORS
   app.enableCors();
 
   const port = process.env.BFF_API_PORT;
