@@ -17,9 +17,10 @@ async function bootstrap() {
   .setVersion('1.0.0')
   .addTag("Category")
   .addTag("Health")
+  .addTag("Product")
   .build();
   let document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('documentacion', app, document);
+  SwaggerModule.setup('docs', app, document);
   //CORS
   app.enableCors();
 

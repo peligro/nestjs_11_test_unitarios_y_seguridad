@@ -6,6 +6,7 @@ import { CategoryDto } from '../../dto/category.dto';
 import { getException } from '../../helpers/helpers';
 import slugify from 'slugify';
 import { Product } from '../../entities/product.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class CategoryService {
@@ -14,6 +15,7 @@ export class CategoryService {
         private readonly repository: Repository<Category>,
         @InjectRepository(Product)
         private readonly repositoryProduct: Repository<Product>,
+        private readonly configService: ConfigService,
     ) { }
 
     async findAll(): Promise<Category[]> {
@@ -29,7 +31,7 @@ export class CategoryService {
     async findOne(id: number) {
         const data = await this.repository.findOneBy({ id });
         if (!data) {
-            return getException(`${process.env.MESSAGE_CUSTOM_RESOURCE_NOT_AVAILABLE}`);
+            return getException(`${this.configService.get<string>('MESSAGE_CUSTOM_RESOURCE_NOT_AVAILABLE')}`);
         }
         return data;
     }
@@ -43,7 +45,7 @@ export class CategoryService {
                 }
             });
         if (existe) {
-            return getException(`${process.env.MESSAGE_ALREADY_EXISTS}`);
+            return getException(`${this.configService.get<string>('MESSAGE_ALREADY_EXISTS')}`);
         } else {
             try {
 
@@ -53,9 +55,9 @@ export class CategoryService {
                 });
 
                 await this.repository.save(save);
-                return { "state": "ok", "message": `${process.env.MESSAGE_CUSTOM_SUCCESS}` }
+                return { "state": "ok", "message": `${this.configService.get<string>('MESSAGE_CUSTOM_SUCCESS')}` }
             } catch (error) {
-                return getException(`${process.env.MESSAGE_CUSTOM_ERROR}`);
+                return getException(`${this.configService.get<string>('MESSAGE_CUSTOM_ERROR')}`);
             }
 
         }
@@ -69,7 +71,7 @@ export class CategoryService {
         });
 
         if (!existe) {
-            return getException(`${process.env.MESSAGE_CUSTOM_RESOURCE_NOT_AVAILABLE}`);
+            return getException(`${this.configService.get<string>('MESSAGE_CUSTOM_RESOURCE_NOT_AVAILABLE')}`);
         }
         
         // Verificar si el nuevo nombre ya existe (si es diferente al actual)
@@ -79,7 +81,7 @@ export class CategoryService {
             });
 
             if (existeNombre) {
-                return getException(`${process.env.MESSAGE_ALREADY_EXISTS}`);
+                return getException(`${this.configService.get<string>('MESSAGE_ALREADY_EXISTS')}`);
             }
         }
         try {
@@ -89,10 +91,10 @@ export class CategoryService {
                 slug: slugify(dto.name, { lower: true, strict: true })
             });
 
-        return { "state": "ok", "message": `${process.env.MESSAGE_CUSTOM_SUCCESS_UPDATE}` }
+        return { "state": "ok", "message": `${this.configService.get<string>('MESSAGE_CUSTOM_SUCCESS_UPDATE')}` }
 
         } catch (error) {
-            return getException(`${process.env.MESSAGE_CUSTOM_ERROR}`);
+            return getException(`${this.configService.get<string>('MESSAGE_CUSTOM_ERROR')}`);
         }
     }
 
@@ -100,7 +102,7 @@ export class CategoryService {
         const category = await this.repository.findOne({ where: { id } });
 
         if (!category) {
-            return getException(`${process.env.MESSAGE_CUSTOM_RESOURCE_NOT_AVAILABLE}`);
+            return getException(`${this.configService.get<string>('MESSAGE_CUSTOM_RESOURCE_NOT_AVAILABLE')}`);
         }
         let existe = await this.repositoryProduct.findOne(
             {
@@ -111,13 +113,13 @@ export class CategoryService {
             });
         if(existe)
         {
-            return getException(`${process.env.MESSAGE_CANNOT_BE_DELETED}`);
+            return getException(`${this.configService.get<string>('MESSAGE_CANNOT_BE_DELETED')}`);
         }
         try {
             await this.repository.delete(id);
-            return { "state": "ok", "message": `${process.env.MESSAGE_CUSTOM_SUCCESS_DELETE}` }
+            return { "state": "ok", "message": `${this.configService.get<string>('MESSAGE_CUSTOM_SUCCESS_DELETE')}` }
         } catch (error) {
-            return getException(`${process.env.MESSAGE_CUSTOM_ERROR}`);
+            return getException(`${this.configService.get<string>('MESSAGE_CUSTOM_ERROR')}`);
         }
 
     }
