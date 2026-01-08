@@ -5,7 +5,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Product } from '../../entities/product.entity';
 import { createMockConfigService, expectHttpExceptionMessage } from '../../../../../test/mocks/mock-config-service';
 import { createMockRepository } from '../../../../../test/mocks/mock-repositories';
-import { mockCategory, mockDatadtoProduct, mockDataProduct, mockDataProducts } from '../../../../../test/mocks/mock-data';
+import { mockCategory, mockDatadtoProduct, mockDataProduct, mockDataProductDuplicate, mockDataProducts } from '../../../../../test/mocks/mock-data';
 import { TEST_MESSAGES } from '../../../../../test/mocks/test-messages';
 import { Category } from '../../entities/category.entity';
 import slugify from 'slugify';
@@ -183,41 +183,66 @@ describe('ProductService', () => {
       productRepo.findOne.mockResolvedValueOnce(null);
 
       await expectHttpExceptionMessage(
-        service.update(999, {  name: 'New Name',
-        description: "Descripción con ñandú",
-        picture: "https://dummyimage.com/300x300/000/fff.png&text=laser  ",
-        category_id: 1,
-        isActive: true}),
+        service.update(999, {
+          name: 'New Name',
+          description: "Descripción con ñandú",
+          picture: "https://dummyimage.com/300x300/000/fff.png&text=laser  ",
+          category_id: 1,
+          isActive: true
+        }),
         TEST_MESSAGES.NOT_FOUND,
       );
     });
 
     it('should throw if new name already exists', async () => {
-      const existing = { id: 1, name: 'Old', slug: 'old',
-        description: "Descripción con ñandú",
-        picture: "https://dummyimage.com/300x300/000/fff.png&text=laser  ",
-        category_id: 1,
-        isActive: true };
-      const duplicate = { id: 2, name: 'New', slug: 'new',
-        description: "Descripción con ñandú",
-        picture: "https://dummyimage.com/300x300/000/fff.png&text=laser  ",
-        category_id: 1,
-        isActive: true };
+     
       productRepo.findOne
-        .mockResolvedValueOnce(existing)
-        .mockResolvedValueOnce(duplicate);
+        .mockResolvedValueOnce(mockDataProduct)
+        .mockResolvedValueOnce(mockDataProductDuplicate);
 
       await expectHttpExceptionMessage(
-        service.update(1, { name: 'New',
-        description: "Descripción con ñandú",
-        picture: "https://dummyimage.com/300x300/000/fff.png&text=laser  ",
-        category_id: 1,
-        isActive: true }),
+        service.update(1, {
+          name: 'New',
+          description: "Descripción con ñandú",
+          picture: "https://dummyimage.com/300x300/000/fff.png&text=laser  ",
+          category_id: 1,
+          isActive: true
+        }),
         TEST_MESSAGES.ALREADY_EXISTS,
       );
     });
 
+    it('should allow updating with the same name (no duplicate check)', async () => {
      
+ 
+
+      // Simula que el producto existe
+      productRepo.findOne.mockResolvedValueOnce(mockDataProduct);
+
+      // ✅ ¡CRÍTICO! Simula que la categoría existe
+      categoryRepo.findOne.mockResolvedValue(mockCategory);
+
+      // Simula actualización exitosa
+      productRepo.update.mockResolvedValue(undefined);
+
+      // Llama con `dto`, no con `mockDatadtoProduct` (para evitar confusión)
+      const result = await service.update(1, mockDatadtoProduct);
+
+      expect(result).toEqual({
+        state: 'ok',
+        message: TEST_MESSAGES.UPDATE,
+      });
+
+      // Verifica que se actualizó con los datos correctos
+      expect(productRepo.update).toHaveBeenCalledWith(1, {
+        name: mockDatadtoProduct.name,
+        slug: 'same', // mismo slug porque el nombre no cambia
+        description: mockDatadtoProduct.description,
+        picture: mockDatadtoProduct.picture,
+        category_id: mockCategory, // ← entidad completa, no solo el ID
+        isActive: mockDatadtoProduct.isActive,
+      });
+    });
 
 
   });

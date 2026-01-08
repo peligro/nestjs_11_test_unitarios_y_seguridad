@@ -37,18 +37,26 @@ export const mockCategories = [
 export const mockCategory={ id: 1, name: 'Books', slug: 'books' };
 export const mockDataProduct = {
         id: 1,
-       "name": "Nivel láser",
-        "slug": "nivel-laser",
-        "description": "Autonivelante, 10 m",
-        "picture": "https://dummyimage.com/300x300/000/fff.png&text=laser",
+        name: 'Same',
+        slug: 'same',
+        description: "Autonivelante, 10 m",
+        picture: "https://dummyimage.com/300x300/000/fff.png&text=laser    ",
         category_id: mockCategory,
-        isActive: true,
+        isActive: true
       };
- 
+export const mockDataProductDuplicate = {
+        id: 2, 
+        name: 'New', slug: 'new',
+        description: "Descripción con ñandú",
+        picture: "https://dummyimage.com/300x300/000/fff.png&text=laser  ",
+        category_id: 1,
+        isActive: true
+      };
 export const mockDatadtoProduct = {
-    "name": "Producto modificado ñañá",
-    "description": "Descripción con ñandú",
-    "picture": "https://dummyimage.com/300x300/000/fff.png&text=laser",
-    "category_id": 1,
-    "isActive": false
+    name: 'Same',
+        description: "Autonivelante, 10 m",
+        picture: "https://dummyimage.com/300x300/000/fff.png&text=laser    ",
+        category_id: 1, // ← coincide con mockCategory.id
+        isActive: true
 };
+export const mockDtoCategory={name: 'Books', slug: 'books' };
