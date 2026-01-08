@@ -24,6 +24,9 @@ export class Product {
     @JoinColumn({ name: 'category_id' })
     category_id: Category
 
+    
+ 
+
     @Column({ type: 'boolean', default: true })
     isActive: boolean;
 

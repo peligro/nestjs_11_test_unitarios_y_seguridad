@@ -1,4 +1,4 @@
-export const mockDataProduct = [
+export const mockDataProducts = [
         {
         "id": 391,
         "name": "Nivel láser",
@@ -30,7 +30,21 @@ export const mockDataProduct = [
         "updatedAt": "2026-01-06T22:20:47.105Z"
     }
 ];
-
+export const mockDataProduct = {
+        "id": 391,
+        "name": "Nivel láser",
+        "slug": "nivel-laser",
+        "description": "Autonivelante, 10 m",
+        "picture": "https://dummyimage.com/300x300/000/fff.png&text=laser",
+        "category_id": {
+            "id": 30,
+            "name": "Ferretería",
+            "slug": "ferreteria"
+        },
+        "isActive": true,
+        "createdAt": "2026-01-06T22:20:47.105Z",
+        "updatedAt": "2026-01-06T22:20:47.105Z"
+         };
 export const mockCategories = [
         { id: 2, name: 'Books', slug: 'books' },
         { id: 1, name: 'Electronics', slug: 'electronics' },

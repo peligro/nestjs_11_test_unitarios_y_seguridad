@@ -6,7 +6,8 @@ import { createMockRepository } from '../../../../../test/mocks/mock-repositorie
 import { Category } from '../../entities/category.entity';
 import { Product } from '../../entities/product.entity';
 import { ConfigService } from '@nestjs/config';
-import { createMockConfigService } from '../../../../../test/mocks/mock-config-service';
+import { createMockConfigService, expectHttpExceptionMessage } from '../../../../../test/mocks/mock-config-service';
+import { TEST_MESSAGES } from '../../../../../test/mocks/test-messages';
 
 describe('CategoryController', () => {
   let controller: CategoryController;
@@ -63,5 +64,25 @@ describe('CategoryController', () => {
       });
     });
   });
+  describe('findOne', () => {
+      it('should return a category when it exists', async () => {
+        const mockCategory = { id: 1, name: 'Electronics', slug: 'electronics' };
+        categoryRepo.findOneBy.mockResolvedValue(mockCategory);
+  
+        const result = await service.findOne(1);
+  
+        expect(result).toEqual(mockCategory);
+        expect(categoryRepo.findOneBy).toHaveBeenCalledWith({ id: 1 });
+      });
+  
+      it('should throw an exception when category does not exist', async () => {
+        categoryRepo.findOneBy.mockResolvedValue(null);
+  
+        await expectHttpExceptionMessage(
+          service.findOne(999),
+          TEST_MESSAGES.NOT_FOUND,
+        );
+      });
+    });
 
 });
